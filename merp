@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 14 23:06:08 2019
+
+@author: ChaseWeaver
+"""
+
+def main():
+    file = open("ERsim.txt" , "r")
+    allLines = file.readlines()
+    # create three empty Queues; HAVE to be global because will use them in other functions
+    global critical
+    global serious
+    global fair
+    critical = Queue()
+    serious = Queue()
+    fair = Queue()
+
+    for command in allLines: # process each line
+        command = command.strip() # get rid of trailing whitespaces
+        
+        # the add process
+        if (command[0:3] == "add"):
+            addPatient(command)
+
+        # the treat next process
+        elif (command == "treat next"):
+            print("Treat next patient\n")
+            treatNext()
+
+        # the treat all process
+        elif (command == "treat all"):
+            print("Treat all patients\n")
+            treatAll()
+
+        # the exit process
+        elif (command == "exit"):
+            print("Exit")
+
+def addPatient(command):
+    ''' command is a string '''
+    temp = command.split()   # split command to 3 words stored in a list, so we can check the condition
+    if (temp[2] == "Critical"):
+        critical.enqueue(temp[1])
+        print("Add patient " + temp[1] + " to Critical queue")
+    elif (temp[2] == "Serious"):
+        serious.enqueue(temp[1])
+        print("Add patient " + temp[1] + " to Serious queue")
+    elif (temp[2] == "Fair"):
+        fair.enqueue(temp[1])
+        print("Add patient " + temp[1] + " to Fair queue")
+    print("Queues are:")
+    print("Criticals: " + str(critical))
+    print("Serious: " + str(serious))
+    print("Fair: " + str(fair))
+    print()
+
+def treatNext():
+    if not critical.isEmpty():
+        patient = critical.dequeue()
+        print("Treating " + patient + " from Critical queue")
+        print("Queues are:")
+        print("Criticals: " + str(critical))
+        print("Serious: " + str(serious))
+        print("Fair: " + str(fair))
+        print()
+    elif not serious.isEmpty():
+        patient = serious.dequeue()
+        print("Treating " + patient + " from Serious queue")
+        print("Queues are:")
+        print("Criticals: " + str(critical))
+        print("Serious: " + str(serious))
+        print("Fair: " + str(fair))
+        print()
+    elif not fair.isEmpty():
+        patient = fair.dequeue()
+        print("Treating " + patient + " from Fair queue")
+        print("Queues are:")
+        print("Criticals: " + str(critical))
+        print("Serious: " + str(serious))
+        print("Fair: " + str(fair))
+        print()
+    else:  # all queues are empty
+        print("No patients in queues\n")
+
+def treatAll():
+    while True:
+        # if there is still patient in any queue, treat next patient
+        if not (critical.isEmpty() and serious.isEmpty() and fair.isEmpty()):
+            treatNext()
+        else: # if not, end the loop
+            print("No patients in queues\n")
+            break
+
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    # left is rear, right is front
+    def enqueue(self,item):
+        self.items.insert(0,item)
+
+    # return the item dequeued
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
+    def __str__(self):
+        return str(self.items)
+
+main()
+
